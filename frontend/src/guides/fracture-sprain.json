@@ -1,0 +1,60 @@
+{
+  "id": "fracture-sprain",
+  "title": "Fracture or Sprain",
+  "severity": "moderate",
+  "severity_color": "yellow",
+  "icon": "bone",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the limb obviously bent or deformed, is bone visible through the skin, or is there heavy bleeding?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes", "next": "step-2a" },
+        { "label": "No", "next": "step-2b" }
+      ]
+    },
+    {
+      "id": "step-2a",
+      "prompt": "Call emergency services now. Do not try to straighten the limb. If bone is exposed, cover the wound with a clean dressing and press around the bone, not on it, to control bleeding.",
+      "type": "instruction",
+      "next": "step-3a",
+      "critical": true
+    },
+    {
+      "id": "step-3a",
+      "prompt": "Support the limb in the position you found it using rolled clothing, cushions, or your hands. Keep the person still and warm, and do not give them food or drink in case surgery is needed.",
+      "type": "terminal",
+      "cta": "Keep the limb still until emergency services arrive",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2b",
+      "prompt": "Can the person put weight on it or move the joint, with pain that is bearable?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, painful but usable", "next": "step-3b" },
+        { "label": "No, cannot use it", "next": "step-3c" }
+      ]
+    },
+    {
+      "id": "step-3c",
+      "prompt": "Treat it as a possible fracture. Keep the limb still with padding, a sling, or a rolled-up magazine as a splint. Do not let them eat or drink. Arrange transport to urgent care or an emergency department.",
+      "type": "terminal",
+      "cta": "Get an X-ray and medical assessment today"
+    },
+    {
+      "id": "step-3b",
+      "prompt": "Follow RICE: Rest the limb. Apply Ice wrapped in a cloth for up to 20 minutes. Compress gently with an elastic bandage. Elevate it above heart level if possible.",
+      "type": "instruction",
+      "next": "step-4b"
+    },
+    {
+      "id": "step-4b",
+      "prompt": "Reassess after 20 minutes. Get medical advice if pain or swelling gets worse, the area looks misshapen, or they still cannot bear weight after two days.",
+      "type": "terminal",
+      "cta": "Monitor and reassess"
+    }
+  ]
+}

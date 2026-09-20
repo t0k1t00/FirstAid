@@ -1,0 +1,60 @@
+{
+  "id": "head-injury",
+  "title": "Head Injury",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person unconscious, not breathing, or have they lost consciousness at any point?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes", "next": "step-cpr" },
+        { "label": "No, they are conscious", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-cpr",
+      "prompt": "Call emergency services immediately. If they are not breathing and you know CPR, begin chest compressions. Open the airway carefully without moving the neck.",
+      "type": "terminal",
+      "cta": "Call emergency services and begin CPR if trained",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Do NOT move the person if you suspect a neck or spine injury (high-speed accident, fall from height, diving injury). Keep them still.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Check for any of these danger signs: severe headache, repeated vomiting, confusion, seizure, unequal pupils, or bleeding/clear fluid from ears or nose.",
+      "type": "decision",
+      "options": [
+        { "label": "Any danger signs present", "next": "step-emergency" },
+        { "label": "None present", "next": "step-4" }
+      ]
+    },
+    {
+      "id": "step-emergency",
+      "prompt": "These are signs of a serious brain injury. Call emergency services immediately. Keep the person still, warm, and calm. Monitor their breathing.",
+      "type": "terminal",
+      "cta": "Call emergency services — do not leave the person",
+      "call_emergency": true
+    },
+    {
+      "id": "step-4",
+      "prompt": "Apply gentle pressure to any scalp wound with a clean cloth. Head wounds bleed heavily even when minor — this does not mean the injury is severe.",
+      "type": "instruction",
+      "next": "step-5"
+    },
+    {
+      "id": "step-5",
+      "prompt": "Even if mild, the person should be observed closely for the next 24 hours. They must not be left alone, drink alcohol, drive, or take sedatives. Go to hospital if any new symptoms develop.",
+      "type": "terminal",
+      "cta": "Monitor for 24 hours — seek care if symptoms develop"
+    }
+  ]
+}

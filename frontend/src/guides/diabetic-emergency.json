@@ -1,0 +1,54 @@
+{
+  "id": "diabetic-emergency",
+  "title": "Diabetic Emergency",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "activity",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person unconscious, unable to swallow, or having a seizure?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — cannot swallow or unconscious", "next": "step-severe" },
+        { "label": "No — conscious and able to swallow", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-severe",
+      "prompt": "Call emergency services immediately. Do not give anything by mouth. Place in recovery position if unconscious but breathing. If trained and a glucagon kit is available, use it as instructed.",
+      "type": "terminal",
+      "cta": "Call emergency services — do not give anything by mouth",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "When in doubt, treat as low blood sugar (hypoglycaemia) — giving sugar will help this and does little harm if blood sugar is actually high. Give a fast-acting sugary food or drink: 15–20 g of glucose (e.g. 4–5 glucose tablets, 150 ml fruit juice, or 5–6 regular jelly beans).",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Wait 15 minutes. Is the person improving — more alert, less confused?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — improving", "next": "step-4" },
+        { "label": "No — not improving or getting worse", "next": "step-worsen" }
+      ]
+    },
+    {
+      "id": "step-worsen",
+      "prompt": "Call emergency services. Repeat the sugary drink/snack if they are still able to swallow safely. Do not leave them alone.",
+      "type": "terminal",
+      "cta": "Call emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-4",
+      "prompt": "Once improved, give a longer-acting carbohydrate snack such as a sandwich, crackers, or a glass of milk. Encourage them to check their blood sugar if they have a meter. The person should contact their diabetes care team.",
+      "type": "terminal",
+      "cta": "Give a slow-release snack and advise follow-up with their care team"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "minor-cuts",
+  "title": "Minor Cuts & Wounds",
+  "severity": "moderate",
+  "severity_color": "yellow",
+  "icon": "bleeding",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is this a deep, gaping, or heavily bleeding wound? If so, move to the Severe Bleeding guide instead.",
+      "type": "decision",
+      "options": [
+        { "label": "Minor wound", "next": "step-2" },
+        { "label": "Deep or heavily bleeding", "next": "step-major" }
+      ]
+    },
+    {
+      "id": "step-major",
+      "prompt": "This needs more than minor wound care. Apply firm pressure and call emergency services or go to an emergency department.",
+      "type": "terminal",
+      "cta": "Apply pressure and get help",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Apply gentle pressure with a clean cloth or gauze for a few minutes to stop bleeding. Elevate the injured area above the level of the heart if possible.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Rinse the wound gently under clean running water for several minutes to remove dirt and debris. Do not scrub.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Pat dry with a clean cloth. Apply an antiseptic if available, then cover with a sterile adhesive dressing or bandage.",
+      "type": "instruction",
+      "next": "step-5"
+    },
+    {
+      "id": "step-5",
+      "prompt": "Was the wound caused by an animal bite, dirty object (rusty nail, soil), or is there any sign of infection (increasing redness, pus, swelling, warmth)?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes", "next": "step-medical" },
+        { "label": "No", "next": "step-done" }
+      ]
+    },
+    {
+      "id": "step-medical",
+      "prompt": "Seek medical care to assess the need for tetanus booster, antibiotics, or wound closure. Animal bites also need evaluation for infection risk.",
+      "type": "terminal",
+      "cta": "Get medical care"
+    },
+    {
+      "id": "step-done",
+      "prompt": "Change the dressing daily or if wet/soiled. Seek care if the wound does not begin to close, becomes red or swollen, or you are unsure about tetanus status.",
+      "type": "terminal",
+      "cta": "Monitor and change dressing daily"
+    }
+  ]
+}

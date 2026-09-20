@@ -1,0 +1,44 @@
+{
+  "id": "insect-bite-sting",
+  "title": "Insect Bite or Sting",
+  "severity": "moderate",
+  "severity_color": "yellow",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Are there signs of a serious allergic reaction? (Difficulty breathing, throat swelling, widespread rash, dizziness, collapse.)",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — possible anaphylaxis", "next": "step-anaphylaxis" },
+        { "label": "No — local reaction", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-anaphylaxis",
+      "prompt": "This may be anaphylaxis. Call emergency services immediately. If the person has an epinephrine auto-injector (EpiPen), use it now. Lay them down with legs raised unless breathing is difficult.",
+      "type": "terminal",
+      "cta": "Use EpiPen if available and call emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "If a bee stinger is still in the skin, scrape it out sideways with a fingernail or the edge of a card. Do not squeeze or use tweezers — this injects more venom.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Wash the area with soap and water. Apply a cold pack or wrapped ice for 10 minutes to reduce swelling and pain.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Calamine lotion, antihistamine cream, or oral antihistamine can relieve itching and local swelling. Keep the bite area clean and do not scratch.",
+      "type": "terminal",
+      "cta": "Monitor for worsening reaction"
+    }
+  ]
+}

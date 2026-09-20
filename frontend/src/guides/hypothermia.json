@@ -1,0 +1,50 @@
+{
+  "id": "hypothermia",
+  "title": "Hypothermia / Frostbite",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person unconscious, not breathing, or showing severe shivering with confusion?",
+      "type": "decision",
+      "options": [
+        { "label": "Unconscious or severe symptoms", "next": "step-severe" },
+        { "label": "Conscious, shivering, but alert", "next": "step-mild" }
+      ]
+    },
+    {
+      "id": "step-severe",
+      "prompt": "Call emergency services immediately. Handle the person very gently — do not massage limbs. If not breathing and you are trained, begin CPR. Keep them horizontal.",
+      "type": "terminal",
+      "cta": "Call emergency services — keep horizontal and still",
+      "call_emergency": true
+    },
+    {
+      "id": "step-mild",
+      "prompt": "Move them to a warm shelter out of the wind and wet. Remove any wet clothing. Insulate with dry blankets, clothing, or sleeping bag — cover the head.",
+      "type": "instruction",
+      "next": "step-2"
+    },
+    {
+      "id": "step-2",
+      "prompt": "If fully conscious and able to swallow, give warm (not hot) sweet drinks. Do not give alcohol. Do not rub or massage limbs — this can send cold blood to the heart.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "For frostbite: do NOT thaw the affected area if there is any risk of it refreezing — this causes more damage. Cover loosely with a clean dry dressing.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Even if the person seems to be improving, seek medical care for all significant cold exposure and any frostbite. Rewarming should be done under medical supervision.",
+      "type": "terminal",
+      "cta": "Warm gently and seek medical care"
+    }
+  ]
+}

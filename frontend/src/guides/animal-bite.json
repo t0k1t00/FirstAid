@@ -1,0 +1,44 @@
+{
+  "id": "animal-bite",
+  "title": "Animal Bite",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is there severe bleeding or is the wound very deep?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — severe bleeding", "next": "step-bleed" },
+        { "label": "No — manageable wound", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-bleed",
+      "prompt": "Apply firm pressure with a clean cloth. If bleeding is heavy, call emergency services. Follow the Severe Bleeding guide.",
+      "type": "terminal",
+      "cta": "Control bleeding and call for help",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Wash the wound thoroughly under running water for at least 5 minutes. Use soap if available. This is the most important step to reduce infection risk.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Cover the wound with a clean dressing. Do not close a bite wound with tape or stitches without medical advice — bites are prone to infection and may need to be left open.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "All animal bites need medical assessment for: infection risk, tetanus status, and (for wild animals or bats) potential rabies exposure. Seek care even if the wound looks minor.",
+      "type": "terminal",
+      "cta": "Seek medical care for all animal bites"
+    }
+  ]
+}

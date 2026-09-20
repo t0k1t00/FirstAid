@@ -1,0 +1,53 @@
+{
+  "id": "chemical-exposure",
+  "title": "Chemical Exposure / Contact",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "warning",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Where has the exposure occurred?",
+      "type": "decision",
+      "options": [
+        { "label": "Skin or clothing contact", "next": "step-skin" },
+        { "label": "Eye contact", "next": "step-eye" },
+        { "label": "Swallowed or inhaled", "next": "step-ingested" }
+      ]
+    },
+    {
+      "id": "step-skin",
+      "prompt": "Move the person away from the chemical source. Remove contaminated clothing and shoes, protecting yourself from contact — use gloves or avoid touching with bare skin. Flush the affected area with large amounts of water for at least 15–20 minutes.",
+      "type": "instruction",
+      "next": "step-skin-2"
+    },
+    {
+      "id": "step-skin-2",
+      "prompt": "Call emergency services or Poison Control. Keep the chemical container or label for identification. Seek medical assessment even if the skin looks minor — some chemicals cause delayed damage.",
+      "type": "terminal",
+      "cta": "Flush with water 15–20 min and seek medical care",
+      "call_emergency": true
+    },
+    {
+      "id": "step-eye",
+      "prompt": "Immediately irrigate the eye with large amounts of clean water. Hold the eye open and let water flow from the inner corner outward. Continue for at least 15–20 minutes continuously. Remove contact lenses after initial irrigation.",
+      "type": "instruction",
+      "next": "step-eye-2"
+    },
+    {
+      "id": "step-eye-2",
+      "prompt": "Call emergency services or go to hospital immediately. Bring the product label. Eye chemical exposure requires urgent specialist assessment.",
+      "type": "terminal",
+      "cta": "Continue irrigation and go to hospital immediately",
+      "call_emergency": true
+    },
+    {
+      "id": "step-ingested",
+      "prompt": "Call emergency services or Poison Control immediately. Do not induce vomiting unless explicitly instructed to. Do not give milk, water, or antidotes unless specifically directed by emergency services. Keep the container label.",
+      "type": "terminal",
+      "cta": "Call emergency services — keep label, do not induce vomiting",
+      "call_emergency": true
+    }
+  ]
+}

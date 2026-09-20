@@ -1,0 +1,65 @@
+{
+  "id": "fainting",
+  "title": "Fainting",
+  "severity": "moderate",
+  "severity_color": "yellow",
+  "icon": "activity",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person unconscious and not waking, or did the collapse occur with no warning signs (no dizziness or light-headedness beforehand)?",
+      "type": "decision",
+      "options": [
+        { "label": "Not waking or sudden collapse with no warning", "next": "step-urgent" },
+        { "label": "Brief faint — already coming round", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-urgent",
+      "prompt": "Call emergency services. Check for breathing. If not breathing and trained, begin CPR. Sudden collapse without warning may have a cardiac or neurological cause.",
+      "type": "terminal",
+      "cta": "Call emergency services — check breathing and begin CPR if needed",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Lay the person flat on their back and raise their legs above the level of their heart — this helps blood flow return to the brain. Do not let them sit up immediately.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Loosen tight clothing around the neck and waist. Ensure fresh air — open windows or move them if in a hot crowded space.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Most faints recover within 1–2 minutes. When they are fully conscious, help them sit up slowly then stand — moving too fast can cause a repeat faint.",
+      "type": "instruction",
+      "next": "step-5"
+    },
+    {
+      "id": "step-5",
+      "prompt": "Is this the person's first unexplained faint, did they injure themselves in the fall, or do they have chest pain or palpitations now?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — any of these", "next": "step-medical" },
+        { "label": "No — simple faint, now recovered", "next": "step-done" }
+      ]
+    },
+    {
+      "id": "step-medical",
+      "prompt": "Seek medical assessment today. A first unexplained faint or one with associated symptoms should be evaluated to rule out a cardiac or neurological cause.",
+      "type": "terminal",
+      "cta": "Seek medical assessment today"
+    },
+    {
+      "id": "step-done",
+      "prompt": "Offer water to sip and something light to eat once fully recovered. Advise the person to avoid standing for long periods and to sit down quickly if they feel faint again.",
+      "type": "terminal",
+      "cta": "Rest and monitor — seek care if it recurs"
+    }
+  ]
+}

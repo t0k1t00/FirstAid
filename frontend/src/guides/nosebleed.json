@@ -1,0 +1,59 @@
+{
+  "id": "nosebleed",
+  "title": "Nosebleed",
+  "severity": "moderate",
+  "severity_color": "yellow",
+  "icon": "bleeding",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Sit the person upright and lean slightly forward (not backward). Tilting back causes blood to run down the throat.",
+      "type": "instruction",
+      "next": "step-2"
+    },
+    {
+      "id": "step-2",
+      "prompt": "Pinch the soft part of the nose firmly just below the bony bridge. Hold continuously for 10 to 15 minutes. Do not release early to check.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "After 10–15 minutes, has the bleeding stopped?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, stopped", "next": "step-done" },
+        { "label": "No, still bleeding", "next": "step-4" }
+      ]
+    },
+    {
+      "id": "step-4",
+      "prompt": "Re-apply firm pinch pressure for another 10–15 minutes. If bleeding continues after a total of 30 minutes, or if blood is very heavy, call emergency services.",
+      "type": "instruction",
+      "next": "step-5"
+    },
+    {
+      "id": "step-5",
+      "prompt": "Did the bleed follow a head injury, or is the person on blood-thinning medication?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes", "next": "step-medical" },
+        { "label": "No", "next": "step-done" }
+      ]
+    },
+    {
+      "id": "step-medical",
+      "prompt": "A nosebleed after a head injury may indicate a skull fracture. Seek medical care promptly. Do not pack the nose.",
+      "type": "terminal",
+      "cta": "Seek medical care",
+      "call_emergency": true
+    },
+    {
+      "id": "step-done",
+      "prompt": "Once stopped, advise the person not to blow their nose, pick at it, or stoop forward for several hours. Seek care if it restarts.",
+      "type": "terminal",
+      "cta": "Rest and monitor"
+    }
+  ]
+}

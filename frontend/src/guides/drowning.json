@@ -1,0 +1,55 @@
+{
+  "id": "drowning",
+  "title": "Drowning / Near-Drowning",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "warning",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person still in the water?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — still in water", "next": "step-water" },
+        { "label": "No — already out of water", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-water",
+      "prompt": "Call emergency services immediately. Reach or throw something to the person — a rope, towel, or floating object — rather than entering the water yourself unless you are a trained rescuer. Only enter the water as a last resort.",
+      "type": "instruction",
+      "next": "step-rescue",
+      "critical": true
+    },
+    {
+      "id": "step-rescue",
+      "prompt": "Once the person is out of the water, check their response and breathing immediately.",
+      "type": "instruction",
+      "next": "step-2"
+    },
+    {
+      "id": "step-2",
+      "prompt": "Call emergency services immediately if not already done. Is the person conscious and breathing normally?",
+      "type": "decision",
+      "options": [
+        { "label": "Unconscious or not breathing", "next": "step-cpr" },
+        { "label": "Conscious and breathing", "next": "step-3" }
+      ]
+    },
+    {
+      "id": "step-cpr",
+      "prompt": "Begin CPR immediately if you are trained. Give 5 rescue breaths first, then 30 compressions and 2 breaths. Continue until emergency services arrive or the person recovers. Do not stop to empty water from the lungs.",
+      "type": "terminal",
+      "cta": "Begin CPR — 5 rescue breaths first — await emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-3",
+      "prompt": "Place in recovery position if unconscious but breathing. If conscious: remove wet clothing, wrap in a warm blanket, and keep them still. Watch for deterioration — near-drowning victims can worsen significantly in the hours after rescue. All near-drowning incidents require hospital assessment.",
+      "type": "terminal",
+      "cta": "Keep warm and await emergency services — hospital assessment is required",
+      "call_emergency": true
+    }
+  ]
+}

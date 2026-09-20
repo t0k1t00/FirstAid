@@ -1,0 +1,56 @@
+{
+  "id": "electrical-injury",
+  "title": "Electrical Injury",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "warning",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person still in contact with the electrical source, or is the power still on?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — still in contact or power on", "next": "step-power" },
+        { "label": "No — separated from source", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-power",
+      "prompt": "Do NOT touch the person. Turn off the power at the main switch or breaker if you can do so safely. Do not use anything metal or wet to separate them. Call emergency services immediately.",
+      "type": "terminal",
+      "cta": "Cut power and call emergency services — do not touch the person",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Call emergency services immediately. All electrical injuries require emergency evaluation — internal burns and cardiac effects may not be visible.",
+      "type": "instruction",
+      "next": "step-3",
+      "critical": true
+    },
+    {
+      "id": "step-3",
+      "prompt": "Check whether the person is conscious and breathing. If not breathing and you are trained, begin CPR. Do not move the person if a fall from height is possible — suspect spinal injury.",
+      "type": "decision",
+      "options": [
+        { "label": "Unconscious or not breathing", "next": "step-cpr" },
+        { "label": "Conscious and breathing", "next": "step-4" }
+      ]
+    },
+    {
+      "id": "step-cpr",
+      "prompt": "Begin CPR if you are trained. Electrical injury can cause cardiac arrest. Keep going until emergency services arrive.",
+      "type": "terminal",
+      "cta": "Begin CPR and await emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-4",
+      "prompt": "Keep the person still and warm. Do not give food or drink. Cover any visible burns with a clean dry dressing — do not use wet dressings or ice. Monitor breathing continuously until help arrives.",
+      "type": "terminal",
+      "cta": "Keep still, cover burns, monitor breathing — await emergency services",
+      "call_emergency": true
+    }
+  ]
+}

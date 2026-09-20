@@ -1,0 +1,7 @@
+{
+  "name": "firstaidflow-backend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Lambda handlers for FirstAidFlow. AWS SDK v3 is provided by the nodejs24.x runtime, so there are no bundled dependencies."
+}

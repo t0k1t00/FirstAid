@@ -1,0 +1,179 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  FirstAidFlow: incident sync API (Lambda + API Gateway + DynamoDB) and
+  static PWA hosting (private S3 bucket behind CloudFront).
+
+Parameters:
+  GuidanceModelId:
+    Type: String
+    Default: amazon.nova-lite-v1:0
+    Description: Bedrock model used only to interpret emergency descriptions into allowed categories.
+  AllowedOrigin:
+    Type: String
+    Default: '*'
+    Description: Browser origin allowed to call the API. Use the deployed CloudFront origin for a locked-down deployment.
+
+Globals:
+  Function:
+    Runtime: nodejs24.x
+    Architectures: [arm64]
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref IncidentsTable
+        ALLOWED_ORIGIN: !Ref AllowedOrigin
+        GUIDANCE_MODEL_ID: !Ref GuidanceModelId
+
+Resources:
+  # ---------------------------------------------------------------- Data
+  IncidentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FirstAidIncidents
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  # ---------------------------------------------------------------- API
+  IncidentsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      # Throttle: 100 req/s burst, 50 req/s steady — prevents runaway costs.
+      # Adjust per expected coordinator count before a large-scale event.
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          ThrottlingBurstLimit: 100
+          ThrottlingRateLimit: 50
+      Cors:
+        AllowOrigin: !Sub "'${AllowedOrigin}'"
+        AllowHeaders: "'Content-Type'"
+        AllowMethods: "'GET,POST,PATCH,OPTIONS'"
+
+  SyncIncidentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: firstaidflow-syncIncident
+      CodeUri: src/
+      Handler: syncIncident.handler
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref IncidentsTable
+      Events:
+        PostIncident:
+          Type: Api
+          Properties:
+            RestApiId: !Ref IncidentsApi
+            Path: /incidents
+            Method: post
+
+
+  GuidanceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: firstaidflow-guidance
+      CodeUri: src/
+      Handler: guidance.handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:Converse
+                - bedrock:InvokeModel
+              Resource: '*'
+      Events:
+        PostGuidance:
+          Type: Api
+          Properties:
+            RestApiId: !Ref IncidentsApi
+            Path: /guidance
+            Method: post
+
+  ListIncidentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: firstaidflow-listIncidents
+      CodeUri: src/
+      Handler: listIncidents.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref IncidentsTable
+      Events:
+        GetIncidents:
+          Type: Api
+          Properties:
+            RestApiId: !Ref IncidentsApi
+            Path: /incidents
+            Method: get
+
+  UpdateIncidentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: firstaidflow-updateIncident
+      CodeUri: src/
+      Handler: updateIncident.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref IncidentsTable
+      Events:
+        PatchIncident:
+          Type: Api
+          Properties:
+            RestApiId: !Ref IncidentsApi
+            Path: /incidents/{id}
+            Method: patch
+
+  # ---------------------------------------------------------------- Web hosting
+  # NOTE: CloudFront was removed because the AWS account is pending CloudFront
+  # verification. S3 static website hosting is used as the fallback.
+  # SPA routing note: S3 website hosting does not support 404->index.html
+  # redirects natively; the app uses hash-based routing as a workaround, or
+  # a CloudFront distribution can be added later once the account is verified.
+  WebBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub firstaidflow-web-${AWS::AccountId}-${AWS::Region}
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+
+  WebBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub ${WebBucket.Arn}/*
+
+Outputs:
+  ApiBaseUrl:
+    Description: Base URL for the incidents API (set as VITE_API_BASE_URL)
+    Value: !Sub https://${IncidentsApi}.execute-api.${AWS::Region}.amazonaws.com/prod
+  WebBucketName:
+    Description: S3 bucket that holds the built PWA
+    Value: !Ref WebBucket
+  WebUrl:
+    Description: Public URL of the PWA (S3 static website endpoint)
+    Value: !Sub http://${WebBucket}.s3-website.${AWS::Region}.amazonaws.com
+  TableName:
+    Value: !Ref IncidentsTable

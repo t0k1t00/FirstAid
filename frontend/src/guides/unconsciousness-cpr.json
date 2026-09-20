@@ -1,0 +1,76 @@
+{
+  "id": "unconsciousness-cpr",
+  "title": "Unconscious / CPR",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "heart",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Check for danger to yourself first. Then tap their shoulders firmly and shout: \"Are you okay?\"",
+      "type": "instruction",
+      "next": "step-2"
+    },
+    {
+      "id": "step-2",
+      "prompt": "Do they respond in any way? Eyes opening, moving, groaning, speaking?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, they respond", "next": "step-3a" },
+        { "label": "No response", "next": "step-3b" }
+      ]
+    },
+    {
+      "id": "step-3a",
+      "prompt": "Help them into a comfortable position, keep them warm, and keep talking to them. Call emergency services if they are confused, very drowsy, have a head injury, or do not fully recover within a few minutes.",
+      "type": "terminal",
+      "cta": "Monitor and reassess"
+    },
+    {
+      "id": "step-3b",
+      "prompt": "Call emergency services now on speaker so your hands are free. Tilt their head back and lift the chin to open the airway. Look, listen, and feel for normal breathing for no more than 10 seconds.",
+      "type": "instruction",
+      "next": "step-4",
+      "critical": true
+    },
+    {
+      "id": "step-4",
+      "prompt": "Are they breathing normally?",
+      "note": "Occasional gasps or gurgles are NOT normal breathing.",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, breathing normally", "next": "step-5a" },
+        { "label": "No, or only gasping", "next": "step-5b" }
+      ]
+    },
+    {
+      "id": "step-5a",
+      "prompt": "Roll them onto their side into the recovery position with the head tilted back so the airway stays open. Check their breathing every minute until help arrives. If breathing stops, start CPR.",
+      "type": "terminal",
+      "cta": "Recovery position. Keep checking breathing.",
+      "call_emergency": true
+    },
+    {
+      "id": "step-5b",
+      "prompt": "Start CPR. Kneel beside them, heel of one hand on the centre of the chest, other hand on top. Push hard and fast, 5 to 6 cm deep, 100 to 120 times a minute (the beat of \"Stayin' Alive\"). Let the chest come all the way back up between pushes.",
+      "type": "instruction",
+      "next": "step-6",
+      "critical": true
+    },
+    {
+      "id": "step-6",
+      "prompt": "After every 30 compressions, give 2 rescue breaths if you are trained and willing. Otherwise keep doing compressions only. Send someone to find a defibrillator (AED), switch it on, and follow its voice prompts.",
+      "type": "instruction",
+      "next": "step-7",
+      "critical": true
+    },
+    {
+      "id": "step-7",
+      "prompt": "Do not stop. Continue until emergency services take over, the person starts breathing normally, or you are physically unable to carry on. Swap with another person every 2 minutes if you can.",
+      "type": "terminal",
+      "cta": "Continue CPR until help arrives",
+      "call_emergency": true
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "asthma-emergency",
+  "title": "Asthma Emergency",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "wind",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person struggling to speak in full sentences, turning blue around the lips, or showing no improvement after using their inhaler?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — severe or not improving", "next": "step-severe" },
+        { "label": "Mild to moderate attack — can still speak", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-severe",
+      "prompt": "Call emergency services immediately. This is a severe attack. Sit the person upright — do not lay them down. If they have a reliever inhaler (blue/salbutamol), help them use it every minute until help arrives.",
+      "type": "terminal",
+      "cta": "Call emergency services — sit upright and use inhaler",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Sit the person upright in a comfortable position — leaning slightly forward can help. Loosen any tight clothing around the chest and neck. Stay calm and encourage slow breathing.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "If they have a reliever inhaler (usually blue), help them use it: 1 puff every 30–60 seconds, up to 10 puffs. Use a spacer if available — it delivers the medicine more effectively.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "After using the inhaler, is the person's breathing improving within 5–10 minutes?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — breathing easier", "next": "step-done" },
+        { "label": "No — no improvement or getting worse", "next": "step-call" }
+      ]
+    },
+    {
+      "id": "step-call",
+      "prompt": "Call emergency services. Continue helping them use the inhaler every minute until help arrives. Do not leave them alone.",
+      "type": "terminal",
+      "cta": "Call emergency services — continue inhaler every minute",
+      "call_emergency": true
+    },
+    {
+      "id": "step-done",
+      "prompt": "Even if improved, the person should see a doctor or go to hospital today. An asthma attack that needed this much reliever should always be medically reviewed.",
+      "type": "terminal",
+      "cta": "Seek medical review today"
+    }
+  ]
+}

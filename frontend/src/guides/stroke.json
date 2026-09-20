@@ -1,0 +1,46 @@
+{
+  "id": "stroke",
+  "title": "Stroke (Suspected)",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "activity",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Use FAST to check for stroke signs:\n\nFace — Ask them to smile. Does one side droop?\nArms — Ask them to raise both arms. Does one drift down?\nSpeech — Ask them to repeat a simple phrase. Is it slurred or strange?\nTime — If any of these are present, call emergency services immediately.",
+      "type": "decision",
+      "options": [
+        { "label": "Any FAST sign present", "next": "step-call" },
+        { "label": "No FAST signs — other concern", "next": "step-other" }
+      ]
+    },
+    {
+      "id": "step-call",
+      "prompt": "Call emergency services immediately. Note the exact time symptoms started — this is critical for treatment decisions. Do not give the person anything to eat or drink.",
+      "type": "instruction",
+      "next": "step-2",
+      "critical": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Help the person sit or lie in a comfortable position. If conscious: support the head and upper body slightly raised. If unconscious but breathing: place in recovery position on their weaker side. Do not leave them alone.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Do not give aspirin or any medication — this can cause harm if the stroke is caused by bleeding rather than a clot. Monitor breathing and responsiveness until emergency services arrive.",
+      "type": "terminal",
+      "cta": "Note symptom time and await emergency services — do not give medication",
+      "call_emergency": true
+    },
+    {
+      "id": "step-other",
+      "prompt": "FAST is the primary stroke check. Other symptoms may include: sudden severe headache with no known cause, sudden vision loss in one eye, sudden severe dizziness or loss of balance. If these are sudden and severe, call emergency services.",
+      "type": "terminal",
+      "cta": "When in doubt, call emergency services — sudden neurological symptoms need urgent review",
+      "call_emergency": true
+    }
+  ]
+}

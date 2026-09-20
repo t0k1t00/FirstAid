@@ -1,0 +1,60 @@
+{
+  "id": "seizure",
+  "title": "Seizure",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "activity",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is this the person's first seizure, is the seizure lasting more than 5 minutes, or has another seizure begun immediately after the first?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — call for help", "next": "step-call" },
+        { "label": "No — known epilepsy, short seizure", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-call",
+      "prompt": "Call emergency services immediately.",
+      "type": "instruction",
+      "next": "step-2",
+      "critical": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Protect the person from injury: clear hard or sharp objects away from them. Do NOT hold them down, restrain their movements, or put anything in their mouth. Gently cushion their head with something soft.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Stay with them and note the time the seizure started. Watch for how long it lasts and what happens.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "When convulsions stop, has the person recovered consciousness and is breathing normally?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — becoming conscious and breathing", "next": "step-recovery" },
+        { "label": "No — unconscious or not breathing", "next": "step-cpr" }
+      ]
+    },
+    {
+      "id": "step-cpr",
+      "prompt": "Call emergency services if not already done. Begin CPR if they are not breathing and you are trained.",
+      "type": "terminal",
+      "cta": "Call emergency services and begin CPR if needed",
+      "call_emergency": true
+    },
+    {
+      "id": "step-recovery",
+      "prompt": "Place in recovery position on their side. They may be confused, disoriented, or sleepy for several minutes — this is normal. Stay calm and stay with them. Do not give food, water, or medication during this period.",
+      "type": "terminal",
+      "cta": "Recovery position — stay with them until fully conscious"
+    }
+  ]
+}

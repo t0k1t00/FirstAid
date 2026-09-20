@@ -1,0 +1,56 @@
+{
+  "id": "smoke-inhalation",
+  "title": "Smoke Inhalation",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "wind",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person still in a smoke-filled or burning area?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — still in danger", "next": "step-evacuate" },
+        { "label": "No — already in fresh air", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-evacuate",
+      "prompt": "Move the person to fresh air immediately — only if you can do so without putting yourself at serious risk. Cover both your mouths with a damp cloth if possible. Call emergency services as you go.",
+      "type": "instruction",
+      "next": "step-2",
+      "critical": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Call emergency services immediately. Smoke inhalation causes airway injury, carbon monoxide poisoning, and oxygen deprivation — symptoms can worsen rapidly even if the person feels well at first.",
+      "type": "instruction",
+      "next": "step-3",
+      "critical": true
+    },
+    {
+      "id": "step-3",
+      "prompt": "Is the person conscious and breathing?",
+      "type": "decision",
+      "options": [
+        { "label": "Unconscious or not breathing normally", "next": "step-cpr" },
+        { "label": "Conscious and breathing", "next": "step-4" }
+      ]
+    },
+    {
+      "id": "step-cpr",
+      "prompt": "Begin CPR if you are trained. Continue until emergency services arrive.",
+      "type": "terminal",
+      "cta": "Begin CPR and await emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-4",
+      "prompt": "Sit or lay the person in a comfortable position. If they are struggling to breathe, sitting upright may help. Loosen any tight clothing. Keep them still and warm. Do not give anything to eat or drink. Monitor breathing until help arrives.",
+      "type": "terminal",
+      "cta": "Keep comfortable and monitor until emergency services arrive",
+      "call_emergency": true
+    }
+  ]
+}

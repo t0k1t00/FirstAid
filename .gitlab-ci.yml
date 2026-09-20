@@ -1,0 +1,28 @@
+stages:
+  - validate
+  - build
+
+validate-backend:
+  stage: validate
+  image: public.ecr.aws/sam/build-nodejs24.x:latest
+  script:
+    - cd backend
+    - sam validate --lint --region us-east-1
+
+build-frontend:
+  stage: build
+  image: node:20-alpine
+  cache:
+    key:
+      files:
+        - frontend/package.json
+    paths:
+      - frontend/node_modules/
+  script:
+    - cd frontend
+    - npm install --no-audit --no-fund
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 1 week

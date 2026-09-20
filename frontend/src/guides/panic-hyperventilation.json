@@ -1,0 +1,59 @@
+{
+  "id": "panic-hyperventilation",
+  "title": "Panic Attack / Hyperventilation",
+  "severity": "moderate",
+  "severity_color": "yellow",
+  "icon": "wind",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Are any of these present? Chest pain that does not ease, one-sided weakness or facial drooping, blue lips, loss of consciousness, or symptoms that do not gradually improve with reassurance.",
+      "type": "decision",
+      "options": [
+        { "label": "Any of the above", "next": "step-urgent" },
+        { "label": "None — rapid breathing and distress only", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-urgent",
+      "prompt": "These symptoms may indicate a more serious condition. Call emergency services and do not assume this is only a panic attack.",
+      "type": "terminal",
+      "cta": "Call emergency services — do not assume panic only",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Stay calm and speak in a reassuring, steady voice. Guide the person to a quiet space if possible. Do not leave them alone. Do not suggest they use a paper bag — this can be harmful.",
+      "type": "instruction",
+      "next": "step-3"
+    },
+    {
+      "id": "step-3",
+      "prompt": "Guide them to slow their breathing: breathe in slowly for 4 counts, hold for 2, breathe out slowly for 6. Breathe with them to demonstrate the pace. Remind them that the feeling will pass and they are not in danger.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Are symptoms settling within 10–15 minutes?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — improving", "next": "step-done" },
+        { "label": "No — not improving or worsening", "next": "step-worsen" }
+      ]
+    },
+    {
+      "id": "step-worsen",
+      "prompt": "Seek medical attention. Prolonged or non-resolving symptoms should be assessed to rule out a medical cause.",
+      "type": "terminal",
+      "cta": "Seek medical attention if not improving"
+    },
+    {
+      "id": "step-done",
+      "prompt": "Once recovered, encourage the person to rest in a quiet place and drink water. Advise them to speak to their GP or mental health support about recurring panic attacks — effective treatments are available.",
+      "type": "terminal",
+      "cta": "Rest and encourage GP follow-up for recurring attacks"
+    }
+  ]
+}

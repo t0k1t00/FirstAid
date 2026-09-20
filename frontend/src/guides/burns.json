@@ -1,0 +1,59 @@
+{
+  "id": "burns",
+  "title": "Burns",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "flame",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Start cooling the burn now under cool (not icy) running water for at least 20 minutes. Do this first, before anything else.",
+      "note": "Move the person away from the heat source first if it is safe to do so.",
+      "type": "instruction",
+      "next": "step-2",
+      "critical": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Is the burn bigger than the person's palm, deep (white, leathery, or charred), on the face, hands, feet, genitals, or a major joint, or caused by chemicals or electricity?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, any of these", "next": "step-3a" },
+        { "label": "No, small and shallow", "next": "step-3b" }
+      ]
+    },
+    {
+      "id": "step-3a",
+      "prompt": "Call emergency services now. Keep cooling with water while you wait. For chemical burns, brush off any dry powder first, then keep rinsing and avoid getting the chemical on yourself.",
+      "type": "instruction",
+      "next": "step-4",
+      "critical": true
+    },
+    {
+      "id": "step-3b",
+      "prompt": "While cooling, gently remove jewellery, watches, or loose clothing near the burn before it swells. Never remove anything stuck to the skin.",
+      "type": "instruction",
+      "next": "step-5"
+    },
+    {
+      "id": "step-4",
+      "prompt": "After cooling, cover the burn loosely with cling film or a clean, non-fluffy cloth. Do not use ice, creams, butter, or toothpaste, and do not burst blisters. Keep the person warm and watch their breathing.",
+      "type": "terminal",
+      "cta": "Emergency services are coming. Keep them warm and calm.",
+      "call_emergency": true
+    },
+    {
+      "id": "step-5",
+      "prompt": "Cover the burn loosely with cling film or a clean, non-fluffy dressing. Do not use ice, creams, or butter, and do not burst blisters.",
+      "type": "instruction",
+      "next": "step-6"
+    },
+    {
+      "id": "step-6",
+      "prompt": "Simple pain relief can help if appropriate for the person. Get medical advice if the burn blisters heavily, becomes more painful, or looks red, swollen, or weepy over the next days.",
+      "type": "terminal",
+      "cta": "Monitor and reassess"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "snake-bite",
+  "title": "Snake Bite",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Call emergency services immediately. Snake bites from any unknown snake must be treated as potentially venomous. Time to antivenom is critical.",
+      "type": "instruction",
+      "next": "step-2",
+      "critical": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Keep the person as still as possible. Immobilise the bitten limb at or below heart level. Movement speeds venom spread.",
+      "type": "instruction",
+      "next": "step-3",
+      "critical": true
+    },
+    {
+      "id": "step-3",
+      "prompt": "Remove rings, watches, or tight clothing near the bite site in case of swelling. Do NOT apply a tourniquet, cut the wound, suck out venom, or apply ice — these cause harm.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Note the time of the bite and try to remember the snake's appearance (do not try to capture or handle it). Give this information to emergency services.",
+      "type": "instruction",
+      "next": "step-5"
+    },
+    {
+      "id": "step-5",
+      "prompt": "Monitor the person's breathing, level of consciousness, and the area around the bite for spreading redness or swelling. Stay with them until emergency services arrive.",
+      "type": "terminal",
+      "cta": "Keep still and wait for emergency services",
+      "call_emergency": true
+    }
+  ]
+}

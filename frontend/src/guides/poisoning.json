@@ -1,0 +1,46 @@
+{
+  "id": "poisoning",
+  "title": "Poisoning / Overdose",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "warning",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is the person unconscious, not breathing normally, having a seizure, or do you suspect a large amount was ingested?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — severe symptoms", "next": "step-severe" },
+        { "label": "Conscious and alert", "next": "step-2" }
+      ]
+    },
+    {
+      "id": "step-severe",
+      "prompt": "Call emergency services immediately. If not breathing and trained, begin CPR. Place an unconscious person in the recovery position. Do NOT induce vomiting unless specifically instructed by emergency services.",
+      "type": "terminal",
+      "cta": "Call emergency services — recovery position, do not induce vomiting",
+      "call_emergency": true
+    },
+    {
+      "id": "step-2",
+      "prompt": "Call emergency services or a Poison Control centre immediately, even if the person seems well. Have these ready: what was taken, how much, and when. Keep them calm and do not give anything to eat or drink.",
+      "type": "instruction",
+      "next": "step-3",
+      "critical": true
+    },
+    {
+      "id": "step-3",
+      "prompt": "Do NOT induce vomiting unless Poison Control explicitly instructs you to. Vomiting can cause additional harm with certain poisons, especially corrosives or petroleum products.",
+      "type": "instruction",
+      "next": "step-4"
+    },
+    {
+      "id": "step-4",
+      "prompt": "Keep the substance or its container — the label will help emergency staff identify the poison and the correct treatment. If they vomit, turn them on their side to prevent choking.",
+      "type": "terminal",
+      "cta": "Keep container label and follow Poison Control instructions",
+      "call_emergency": true
+    }
+  ]
+}

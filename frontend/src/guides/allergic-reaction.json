@@ -1,0 +1,61 @@
+{
+  "id": "allergic-reaction",
+  "title": "Allergic Reaction / Anaphylaxis",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "warning",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Are any of these present? Difficulty breathing, throat or tongue swelling, hoarse voice, widespread rash, dizziness, collapse, or very rapid deterioration after exposure to a trigger.",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — any of the above", "next": "step-anaphylaxis" },
+        { "label": "Mild reaction — rash, hives, or local swelling only", "next": "step-mild" }
+      ]
+    },
+    {
+      "id": "step-anaphylaxis",
+      "prompt": "This is anaphylaxis — a life-threatening emergency. Call emergency services immediately. If the person has an epinephrine auto-injector (EpiPen), use it now in the outer thigh.",
+      "type": "instruction",
+      "next": "step-epipen",
+      "critical": true
+    },
+    {
+      "id": "step-epipen",
+      "prompt": "After giving epinephrine: lay the person flat with legs raised unless they are struggling to breathe — in that case let them sit up. A second dose can be given after 5–15 minutes if symptoms return and you have a second injector. Stay with them until emergency services arrive.",
+      "type": "terminal",
+      "cta": "Use EpiPen, lay flat with legs raised, call emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-mild",
+      "prompt": "Remove the trigger if possible (remove a sting, move away from the substance). Give an oral antihistamine if available. Monitor closely — mild reactions can progress rapidly.",
+      "type": "instruction",
+      "next": "step-2"
+    },
+    {
+      "id": "step-2",
+      "prompt": "Is the reaction spreading, worsening, or is the person feeling faint or developing any breathing difficulty?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes — worsening", "next": "step-worsen" },
+        { "label": "No — stable and mild", "next": "step-done" }
+      ]
+    },
+    {
+      "id": "step-worsen",
+      "prompt": "Treat as anaphylaxis. Call emergency services immediately. Use an epinephrine auto-injector if available.",
+      "type": "terminal",
+      "cta": "Use EpiPen if available and call emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-done",
+      "prompt": "Even with a mild reaction, seek medical advice. The person should be observed for several hours as reactions can recur. Anyone who has had a significant allergic reaction should discuss an epinephrine auto-injector prescription with their doctor.",
+      "type": "terminal",
+      "cta": "Seek medical advice and monitor for several hours"
+    }
+  ]
+}

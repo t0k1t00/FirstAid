@@ -1,0 +1,67 @@
+{
+  "id": "heat-illness",
+  "title": "Heat Exhaustion / Heat Stroke",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Check for heat stroke signs: body temperature above 40°C/104°F, hot dry skin (stopped sweating), confusion, slurred speech, or loss of consciousness.",
+      "type": "decision",
+      "options": [
+        { "label": "Heat stroke signs present", "next": "step-heatstroke" },
+        { "label": "Heavy sweating, weakness, but alert (heat exhaustion)", "next": "step-exhaustion" }
+      ]
+    },
+    {
+      "id": "step-heatstroke",
+      "prompt": "Heat stroke is life-threatening. Call emergency services immediately. Cool the person as fast as possible: move to shade, remove outer clothing, apply ice packs to neck, armpits, and groin, use wet cloths and fanning.",
+      "type": "instruction",
+      "next": "step-heatstroke-2",
+      "critical": true
+    },
+    {
+      "id": "step-heatstroke-2",
+      "prompt": "Do not give fluids by mouth if the person is confused or unconscious. Keep cooling until emergency services arrive or temperature falls below 38°C/101°F.",
+      "type": "terminal",
+      "cta": "Continue cooling and await emergency services",
+      "call_emergency": true
+    },
+    {
+      "id": "step-exhaustion",
+      "prompt": "Move the person to a cool, shaded area. Lay them down and raise their legs slightly. Remove excess clothing.",
+      "type": "instruction",
+      "next": "step-exhaustion-2"
+    },
+    {
+      "id": "step-exhaustion-2",
+      "prompt": "Give cool water or a rehydration drink to sip if they are fully conscious. Apply cool damp cloths to skin. Fan them.",
+      "type": "instruction",
+      "next": "step-exhaustion-3"
+    },
+    {
+      "id": "step-exhaustion-3",
+      "prompt": "Is the person improving within 30 minutes?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, feeling better", "next": "step-done" },
+        { "label": "No, getting worse or becoming confused", "next": "step-worsen" }
+      ]
+    },
+    {
+      "id": "step-worsen",
+      "prompt": "Call emergency services — heat exhaustion is progressing to heat stroke. Continue cooling immediately.",
+      "type": "terminal",
+      "cta": "Call emergency services and keep cooling",
+      "call_emergency": true
+    },
+    {
+      "id": "step-done",
+      "prompt": "Stay out of the heat for the rest of the day. Keep drinking fluids. Seek medical advice if symptoms return or do not resolve fully.",
+      "type": "terminal",
+      "cta": "Rest, hydrate, and monitor"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "id": "choking",
+  "title": "Choking",
+  "severity": "life-threatening",
+  "severity_color": "red",
+  "icon": "wind",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Can the person cough, speak, or breathe?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, they can cough", "next": "step-2a" },
+        { "label": "No, or only silent", "next": "step-2b" }
+      ]
+    },
+    {
+      "id": "step-2a",
+      "prompt": "Encourage them to keep coughing hard. Stay with them. Do not slap their back or give abdominal thrusts while they can still cough effectively.",
+      "type": "instruction",
+      "next": "step-3a"
+    },
+    {
+      "id": "step-3a",
+      "prompt": "Did the object come out and are they breathing normally?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes", "next": "step-end-mild" },
+        { "label": "No, getting worse", "next": "step-2b" }
+      ]
+    },
+    {
+      "id": "step-2b",
+      "prompt": "Call emergency services now, or have someone call. Stand behind the person, lean them forward, and give up to 5 sharp back blows between the shoulder blades with the heel of your hand.",
+      "type": "instruction",
+      "next": "step-4",
+      "critical": true
+    },
+    {
+      "id": "step-4",
+      "prompt": "Is the airway clear now? Can they breathe or speak?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes", "next": "step-end-cleared" },
+        { "label": "No", "next": "step-5" }
+      ]
+    },
+    {
+      "id": "step-5",
+      "prompt": "Give up to 5 abdominal thrusts: stand behind them, place your fist just above the navel, grasp it with your other hand, and pull sharply inward and upward.",
+      "note": "If the person is pregnant or you cannot reach around them, give chest thrusts on the centre of the breastbone instead.",
+      "type": "instruction",
+      "next": "step-6",
+      "critical": true
+    },
+    {
+      "id": "step-6",
+      "prompt": "What is happening now?",
+      "type": "decision",
+      "options": [
+        { "label": "Object is out", "next": "step-end-cleared" },
+        { "label": "Still choking, conscious", "next": "step-7" },
+        { "label": "Became unconscious", "next": "step-8" }
+      ]
+    },
+    {
+      "id": "step-7",
+      "prompt": "Keep alternating 5 back blows and 5 abdominal thrusts until the object comes out, they can breathe, or help arrives.",
+      "type": "instruction",
+      "next": "step-6",
+      "critical": true
+    },
+    {
+      "id": "step-8",
+      "prompt": "Lower them carefully to the floor on their back. Start CPR immediately. Each time you open the airway, look in the mouth and remove the object only if you can clearly see it.",
+      "type": "terminal",
+      "cta": "Start CPR now",
+      "call_emergency": true,
+      "next_guide": "unconsciousness-cpr"
+    },
+    {
+      "id": "step-end-mild",
+      "prompt": "Let them rest and keep watching them. Get medical advice if they have a lasting cough, trouble swallowing, or feel like something is still stuck.",
+      "type": "terminal",
+      "cta": "Monitor and reassess"
+    },
+    {
+      "id": "step-end-cleared",
+      "prompt": "Even if they seem fine, they should be checked by a medical professional. Abdominal thrusts can cause internal injuries that are not obvious at first.",
+      "type": "terminal",
+      "cta": "Get a medical check-up today"
+    }
+  ]
+}

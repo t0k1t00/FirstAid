@@ -1,0 +1,67 @@
+{
+  "id": "eye-injury",
+  "title": "Eye Injury / Foreign Object",
+  "severity": "urgent",
+  "severity_color": "orange",
+  "icon": "alert",
+  "start": "step-1",
+  "steps": [
+    {
+      "id": "step-1",
+      "prompt": "Is there a penetrating injury (something embedded in the eye, a sharp object through the eye), or a chemical splashed into the eye?",
+      "type": "decision",
+      "options": [
+        { "label": "Penetrating injury", "next": "step-penetrating" },
+        { "label": "Chemical splash", "next": "step-chemical" },
+        { "label": "Foreign object / dust / scratch", "next": "step-foreign" }
+      ]
+    },
+    {
+      "id": "step-penetrating",
+      "prompt": "Do NOT touch, press on, or try to remove any embedded object. Cover the eye loosely with a clean cloth or paper cup. Call emergency services and go to hospital urgently.",
+      "type": "terminal",
+      "cta": "Cover eye loosely and go to hospital immediately",
+      "call_emergency": true
+    },
+    {
+      "id": "step-chemical",
+      "prompt": "Immediately irrigate the eye with large amounts of clean water or saline. Hold the eye open and let water run from the inner corner outward for at least 15–20 minutes continuously.",
+      "type": "instruction",
+      "next": "step-chemical-2"
+    },
+    {
+      "id": "step-chemical-2",
+      "prompt": "Remove contact lenses if present (after initial irrigation). Seek emergency care promptly, and bring the product label if known.",
+      "type": "terminal",
+      "cta": "Continue irrigation and go to hospital",
+      "call_emergency": true
+    },
+    {
+      "id": "step-foreign",
+      "prompt": "Ask the person not to rub their eye. Gently rinse the eye with clean water or saline from inner corner outward. Blink repeatedly under water if possible.",
+      "type": "instruction",
+      "next": "step-foreign-2"
+    },
+    {
+      "id": "step-foreign-2",
+      "prompt": "Did rinsing dislodge the object?",
+      "type": "decision",
+      "options": [
+        { "label": "Yes, eye feels clear", "next": "step-done" },
+        { "label": "No, still feels like something is there", "next": "step-refer" }
+      ]
+    },
+    {
+      "id": "step-refer",
+      "prompt": "Do not try to remove an object that won't flush out. Cover the eye loosely and seek medical assessment to safely remove it.",
+      "type": "terminal",
+      "cta": "Cover eye and seek medical care"
+    },
+    {
+      "id": "step-done",
+      "prompt": "If the eye remains painful, red, or vision is affected after rinsing, seek medical assessment. Vision problems after any eye injury need professional evaluation.",
+      "type": "terminal",
+      "cta": "Seek care if symptoms persist"
+    }
+  ]
+}
