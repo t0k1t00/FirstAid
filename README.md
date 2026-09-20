@@ -10,7 +10,7 @@
 
 FirstAidFlow is a Progressive Web App that delivers verified step-by-step first-aid guidance and real-time incident coordination support for emergency responders and bystanders. It operates fully offline once installed — guidance, classification, and incident logging all function without a network connection.
 
-> Built for the **AWS Ship It Hackathon 2026**
+> Built for the **First Commit Hackathon 2026**
 
 ---
 
