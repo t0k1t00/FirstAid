@@ -1,191 +1,427 @@
 # FirstAidFlow
 
-**Offline-first emergency guidance and coordination PWA**
+**Offline-first emergency guidance and incident coordination — AWS Serverless PWA**
 
-FirstAidFlow is a Progressive Web App that provides verified first-aid guidance and incident coordination support for emergency responders and bystanders. It works fully offline once installed.
+[![AWS SAM](https://img.shields.io/badge/AWS-SAM-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/serverless/sam/)
+[![Bedrock](https://img.shields.io/badge/AWS-Bedrock-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/bedrock/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![PWA](https://img.shields.io/badge/PWA-Offline--First-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+FirstAidFlow is a Progressive Web App that delivers verified step-by-step first-aid guidance and real-time incident coordination support for emergency responders and bystanders. It operates fully offline once installed — guidance, classification, and incident logging all function without a network connection.
+
+> Built for the **AWS Ship It Hackathon 2026**
 
 ---
 
-## Emergency Coverage
+## Authors
 
-- **52 recognised emergency categories** across 6 groups
-- **27 verified step-by-step guidance guides** (sourced from Red Cross, St John Ambulance, NHS, and specialist charities)
-- **13 escalation-only categories** — these categories are recognised and routed, but the correct response is to call emergency services immediately; no fictional step-by-step guides are bundled for them
-- **12 additional categories** share an existing verified guide (e.g. _Amputation_ uses the _Severe Bleeding_ guide; _Frostbite_ uses the _Hypothermia_ guide)
-- Natural-language emergency description via the Guidance Console
-- AWS Bedrock used for natural-language **classification only** — never for generating medical treatment instructions
-- Verified guide content is the sole source of all first-aid instructions
+| Name | GitHub |
+|---|---|
+| Swathi B Raj | [@t0k1t00](https://github.com/t0k1t00) |
+| Sripriya P | [@Sripriyaaa777](https://github.com/Sripriyaaa777) |
 
-> **Terminology clarification:** A _recognised category_ is a scenario the system can classify. A _verified guide_ is a distinct step-by-step walkthrough. Multiple categories can share one guide where the first-aid response is identical or closely related.
+---
+
+## Live Demo
+
+| Endpoint | URL |
+|---|---|
+| PWA | http://firstaidflow-web-604006982307-ap-south-1.s3-website.ap-south-1.amazonaws.com |
+
+> **Note:** Served over HTTP via S3 static website hosting (CloudFront pending account verification). PWA install requires HTTPS — use Firefox or a browser that permits localhost-equivalent installs, or wait for CloudFront activation.
+
+---
+
+## What It Does
+
+- Guides any bystander through a first-aid emergency step by step — even with no signal
+- Classifies free-text descriptions ("someone is choking and can't breathe") into one of 52 recognised emergency categories using **AWS Bedrock (Amazon Nova Lite)**
+- Falls back to a deterministic local keyword classifier when offline — the AI is augmentation, not a dependency
+- Logs and syncs incidents to a coordinator dashboard with severity indicators, map view, and surge detection
+- Severity is always derived from the taxonomy, never from AI output — the model cannot escalate or downgrade triage on its own
 
 ---
 
 ## Architecture
 
-### Frontend (PWA)
+```mermaid
+flowchart TB
+    subgraph Client["Client — PWA (React + Vite)"]
+        direction TB
+        UI["App Shell\n(React Router)"]
+        SW["Service Worker\n(Workbox — Precache)"]
+        IDB["IndexedDB\n(idb)"]
+        LC["Local Classifier\n(keyword taxonomy)"]
+        SM["Sync Manager\n(retry on reconnect)"]
 
-- React + Vite
-- Service worker (Workbox) for offline-first operation
-- IndexedDB (via `idb`) for offline incident storage
-- Automatic sync queue: incidents created offline are synced when connectivity is restored
-- 52-category emergency taxonomy compiled into the bundle — classification works fully offline
+        UI --> SW
+        UI --> IDB
+        UI --> LC
+        IDB --> SM
+    end
 
-### Backend (AWS Serverless)
+    subgraph AWS["AWS — ap-south-1"]
+        direction TB
+        APIGW["API Gateway\n/prod\n(throttle 50 rps)"]
 
-- **API Gateway** with throttling (100 req/s burst, 50 req/s steady)
-- **AWS Lambda** (Node.js 24 / arm64) functions:
-  - `POST /guidance` — Bedrock classification endpoint
-  - `POST /incidents` — create/sync incident
-  - `GET /incidents?limit=50&cursor=<token>` — cursor-paginated incident list
-  - `PATCH /incidents/{id}` — resolve/update incident
-- **DynamoDB** (PAY_PER_REQUEST) — stores coordinated incident data
-- **S3 + CloudFront** — hosts the built PWA with HTTPS
-- **AWS Bedrock** (Amazon Nova Lite) — natural-language classification only
+        subgraph Lambda["Lambda — nodejs24.x / arm64"]
+            FG["guidance.js\nPOST /guidance"]
+            FS["syncIncident.js\nPOST /incidents"]
+            FL["listIncidents.js\nGET /incidents"]
+            FU["updateIncident.js\nPATCH /incidents/{id}"]
+        end
 
-### Incident Coordination
+        DDB["DynamoDB\nFirstAidIncidents\n(PAY_PER_REQUEST)"]
+        BR["AWS Bedrock\nAmazon Nova Lite\n(classification only)"]
+        S3["S3 Static Website\nBuilt PWA dist/"]
 
-- Coordinator dashboard shows active incidents with severity indicators
-- Incident map shows relative incident positions
-- Cluster detection highlights surge situations
-- Incidents created offline appear in the local view immediately and sync automatically
+        APIGW --> FG
+        APIGW --> FS
+        APIGW --> FL
+        APIGW --> FU
+        FG --> BR
+        FS --> DDB
+        FL --> DDB
+        FU --> DDB
+    end
+
+    Browser["Browser / Mobile"] --> S3
+    Browser --> Client
+    SM -->|"POST /incidents\n(when online)"| APIGW
+    UI -->|"POST /guidance\n(when online)"| APIGW
+    UI -->|"GET /incidents\nDashboard"| APIGW
+
+    LC -.->|"offline fallback"| UI
+    IDB -.->|"queue until online"| SM
+```
+
+### Request flow — Emergency Guidance
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as PWA (browser)
+    participant SW as Service Worker
+    participant API as API Gateway
+    participant Lam as Lambda (guidance.js)
+    participant BR as Bedrock (Nova Lite)
+    participant Tax as Taxonomy Allowlist
+
+    User->>App: Types emergency description
+    App->>SW: Check online status
+    alt Online
+        App->>API: POST /guidance { text }
+        API->>Lam: Invoke
+        Lam->>BR: ConverseCommand (classify only)
+        BR-->>Lam: { categoryIds, clarifyingQuestion }
+        Lam->>Tax: filterValidCategories(ids)
+        Tax-->>Lam: validated IDs only
+        Lam-->>API: { categoryIds, confident }
+        API-->>App: 200 OK
+        App->>App: Derive severity from taxonomy
+    else Offline / API unavailable
+        App->>App: classifyLocal(text) — keyword match
+        App->>App: source = "verified-local-fallback"
+        App->>App: UI shows "AI unavailable" banner
+    end
+    App->>User: Step-by-step verified guide + 112 CTA
+```
+
+### Offline → Sync flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as PWA
+    participant IDB as IndexedDB
+    participant SM as SyncManager
+    participant API as API Gateway /incidents
+    participant DDB as DynamoDB
+
+    User->>App: Create incident (offline)
+    App->>IDB: addIncident({ synced: 0 })
+    App->>User: "Saved offline. Will sync when back online."
+
+    Note over SM: Network restored / tab focus
+    SM->>IDB: getUnsyncedIncidents()
+    IDB-->>SM: [incident, ...]
+    SM->>API: POST /incidents (idempotent)
+    API->>DDB: PutItem (ConditionExpression: id not exists)
+    DDB-->>API: 201 Created
+    API-->>SM: { id, synced_at }
+    SM->>IDB: markIncidentSynced(id)
+    SM->>App: Dispatch sync-state event
+    App->>User: Dashboard updates
+```
 
 ---
 
-## API: Cursor Pagination
+## Emergency Coverage
 
-`GET /incidents` supports cursor-based pagination:
+### 52 Recognised Categories across 6 Groups
+
+| Group | Total | With Guide | Escalation-Only |
+|---|---|---|---|
+| Trauma & Injury | 18 | 14 | 4 |
+| Burns & Environmental | 8 | 7 | 1 |
+| Breathing & Airway | 7 | 6 | 1 |
+| Cardiac & Neurological | 7 | 6 | 1 |
+| Poisoning & Exposure | 5 | 4 | 1 |
+| Acute Medical | 7 | 2 | 5 |
+| **Total** | **52** | **27 guides** | **13 escalation-only** |
+
+**Escalation-only categories** (e.g. crush injury, neck/spinal injury, carbon monoxide) advise calling emergency services immediately. No fictional step-by-step guide is bundled for them — because getting professional help started *is* the correct first-aid response.
+
+**12 additional categories** share an existing guide where the response is identical or closely related (e.g. *Amputation* uses the *Severe Bleeding* guide; *Frostbite* uses the *Hypothermia* guide; *Drug Overdose* uses the *Poisoning* guide).
+
+---
+
+## Tech Stack
+
+### Frontend
+| | |
+|---|---|
+| Framework | React 18 + Vite |
+| Offline | Workbox (GenerateSW, precache-all) |
+| Local storage | IndexedDB via `idb` |
+| Routing | React Router v6 |
+| Icons | Custom SVG icon set (zero emojis) |
+| Fonts | Inter + IBM Plex Mono (Google Fonts) |
+| PWA | Manifest, service worker, installable |
+
+### Backend
+| | |
+|---|---|
+| IaC | AWS SAM (CloudFormation) |
+| Runtime | Node.js 24.x / arm64 |
+| Format | ESM (`type: "module"`) |
+| API | Amazon API Gateway REST (prod stage) |
+| Compute | AWS Lambda × 4 functions |
+| Database | Amazon DynamoDB (PAY_PER_REQUEST) |
+| AI | Amazon Bedrock — Nova Lite (classification only) |
+| Hosting | Amazon S3 static website |
+| SDK | AWS SDK v3 (provided by runtime — zero bundled deps) |
+
+---
+
+## Repository Layout
 
 ```
-GET /incidents?limit=50
-GET /incidents?limit=50&cursor=<nextCursor from previous response>
+FirstAid-main/
+├── backend/
+│   ├── src/
+│   │   ├── guidance.js          # POST /guidance — Bedrock classification
+│   │   ├── syncIncident.js      # POST /incidents — create + validate
+│   │   ├── listIncidents.js     # GET  /incidents — cursor-paginated list
+│   │   ├── updateIncident.js    # PATCH /incidents/{id} — resolve
+│   │   ├── categories.js        # 52-category allowlist + severity resolver
+│   │   └── lib/response.js      # CORS + JSON helpers
+│   └── template.yaml            # SAM template (all AWS resources)
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # React UI components
+│   │   ├── guides/              # 27 verified guide JSON files + index
+│   │   ├── lib/
+│   │   │   ├── emergencyTaxonomy.js   # 52-category taxonomy (single source of truth)
+│   │   │   ├── emergencyClassifier.js # Bedrock + local fallback
+│   │   │   ├── priority.js            # Severity display logic
+│   │   │   ├── surge.js               # Deterministic surge detection
+│   │   │   └── cluster.js             # Incident map clustering
+│   │   ├── db/incidents.js      # IndexedDB CRUD (idb)
+│   │   ├── sync/syncManager.js  # Offline → online sync queue
+│   │   └── incidents/logIncident.js  # Incident creation helpers
+│   ├── .env.example
+│   └── vite.config.js
+└── scripts/
+    ├── deploy-backend.sh
+    ├── deploy-frontend.sh
+    └── test-backend.mjs
 ```
 
-Response shape:
+---
+
+## API Reference
+
+All endpoints are under the deployed API Gateway base URL.
+
+### `POST /guidance`
+Classifies a free-text emergency description using Amazon Bedrock. Returns validated category IDs from the 52-entry allowlist only.
+
+```json
+// Request
+{ "text": "Someone is bleeding heavily from their leg." }
+
+// Response 200
+{
+  "categoryIds": ["severe-bleeding"],
+  "clarifyingQuestion": null,
+  "confident": true,
+  "guideId": "severe-bleeding"
+}
+```
+
+### `POST /incidents`
+Creates and syncs an incident. UUID, timestamp, and category ID are validated server-side. Severity is derived from the taxonomy — never trusted from the client.
+
+```json
+// Request
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "categoryIds": ["severe-bleeding"],
+  "timestamp": "2026-09-20T14:00:00Z",
+  "resolved": false,
+  "source": "guide",
+  "lat": 8.5241,
+  "lng": 76.9366
+}
+
+// Response 201
+{ "id": "550e8400-...", "synced_at": "2026-09-20T14:00:01.234Z" }
+```
+
+### `GET /incidents?limit=50&cursor=<token>`
+Returns a cursor-paginated list of incidents.
+
 ```json
 {
   "incidents": [...],
   "count": 50,
-  "nextCursor": "eyJpZCI6..."
+  "nextCursor": "eyJpZCI6..." // null when no more pages
 }
 ```
 
-`nextCursor` is `null` when there are no more pages.
+### `PATCH /incidents/{id}`
+Resolves or re-opens an incident.
 
-> **Known limitation:** DynamoDB's primary key is `id` (UUID). Without a GSI keyed on a fixed partition + timestamp sort key, the Scan order is not guaranteed to be chronological. A production deployment should add a GSI for time-ordered queries. The Scan-based pagination is bounded and safe for the hackathon scope.
+```json
+// Request
+{ "status": "resolved" }
 
----
-
-## API Configuration
-
-Set `VITE_API_BASE_URL` in `frontend/.env`:
-
-```bash
-# Offline mode — incidents queue locally in IndexedDB and are never synced
-VITE_API_BASE_URL=
-
-# AWS mode — set to the API Gateway stage URL from SAM outputs
-VITE_API_BASE_URL=https://<api-id>.execute-api.<region>.amazonaws.com/prod
+// Response 200
+{ "id": "...", "status": "resolved", "resolved": true, "updated_at": "..." }
 ```
-
-When `VITE_API_BASE_URL` is empty, the app runs in full offline mode. This is not an error — the guidance console, guide walkthroughs, and incident creation all function without a backend.
-
----
-
-## Authentication
-
-**Current status: unauthenticated**
-
-The API endpoints do not currently require authentication. This is intentional for the hackathon demo and offline-first flow. For production:
-
-- Add Amazon Cognito authoriser to API Gateway
-- Restrict the `AllowedOrigin` parameter to the deployed CloudFront domain
-- Consider IP-based rate limiting at CloudFront level
-
-The application is not designed to store personally identifiable information. Incident descriptions are user-provided free text and should be treated as potentially sensitive.
-
----
-
-## CORS
-
-Default `AllowedOrigin: '*'` is set for local development and demo use.
-
-For production, update the `AllowedOrigin` SAM parameter to your CloudFront distribution URL:
-
-```bash
-sam deploy --parameter-overrides AllowedOrigin=https://d1example.cloudfront.net
-```
-
-API Gateway is configured for: `GET, POST, PATCH, OPTIONS`
-
----
-
-## Classification Logic
-
-The Bedrock guidance endpoint classifies free-text descriptions into the 52-category taxonomy. All returned category IDs are validated against the allowlist — the model cannot invent new categories or severity levels.
-
-When Bedrock is unavailable (offline or not configured), the local deterministic classifier runs keyword matching against the taxonomy. **Severity is always derived deterministically from the taxonomy, never from AI output.**
-
-Flow:
-```
-User description
-  → Bedrock classification (if online + configured)
-      → validated against 52-category allowlist
-  → OR local taxonomy classifier (offline / API unavailable)
-  → taxonomy-derived urgency/severity (deterministic)
-  → verified guide or escalation-only response
-```
-
-The model may return an `urgentOverride` flag as an internal safety signal; this flag is **never used to determine the displayed severity**. Severity is always resolved from `category → taxonomy urgency → display severity`.
 
 ---
 
 ## Offline Mode
 
-The following functions without any network connection:
+The following functions without any network connection after the first load:
 
-- PWA install and launch
-- Emergency guidance console (local keyword classifier)
-- All 27 guide walkthroughs
-- Category browse / search (GuideList)
-- Incident creation (stored in IndexedDB)
-- Queued sync (incidents sync automatically when connectivity returns)
+- Emergency guidance console (local keyword classifier across all 52 categories)
+- All 27 guide walkthroughs (precached by service worker)
+- Category browse and search
+- Incident creation (stored in IndexedDB with `synced: 0`)
+- Automatic sync when connectivity is restored — POST is idempotent (duplicate IDs are silently accepted)
 
-The UI clearly distinguishes between:
-- **Offline / local mode** — `VITE_API_BASE_URL` is empty; incidents queue locally
-- **API unavailable** — URL is configured but the request failed; local fallback is used for classification
+The UI is explicit about the distinction:
+- When Bedrock is unavailable: banner reads *"AI guidance is unavailable. Verified emergency guidance remains available."*
+- There are no fake AI responses — the local classifier is labelled as local.
+
+---
+
+## AI Safety Constraints
+
+AWS Bedrock is used **only for classification** — it maps free-text to taxonomy IDs. It cannot:
+
+- Generate medical treatment instructions
+- Invent category IDs outside the 52-entry allowlist
+- Override severity — severity is always resolved from `category → taxonomy urgency → display level`
+- Set the `urgentOverride` flag visible to the frontend — this field is discarded in `guidance.js`
+
+The prompt passed to the model explicitly states:
+> *"You are not a doctor. Do NOT diagnose, prescribe medication, invent treatment instructions, or advise delaying emergency services."*
+
+All returned IDs are validated through `filterValidCategories()` before any response is sent to the client.
 
 ---
 
 ## Local Development
 
 ```bash
-# Frontend
+# Frontend (no backend needed — runs in full offline mode)
 cd frontend
-cp .env.example .env   # Edit VITE_API_BASE_URL if using backend
+cp .env.example .env
+# Leave VITE_API_BASE_URL empty for offline-only mode
 npm ci
 npm run dev
+# → http://localhost:5173
 
-# Backend
+# Backend (requires Docker and AWS credentials)
 cd backend
 sam build
-sam local start-api    # Requires Docker + AWS credentials
+sam local start-api --region ap-south-1
 ```
 
-## Production Deployment
+---
+
+## Deployment
+
+### Backend (AWS SAM)
 
 ```bash
-# Build and deploy backend
 cd backend
 sam build
-sam deploy --guided
-
-# Build and deploy frontend
-cd frontend
-npm run build
-# Upload dist/ to the S3 bucket from SAM outputs
-aws s3 sync dist/ s3://<WebBucketName> --delete
-aws cloudfront create-invalidation --distribution-id <DistributionId> --paths "/*"
+sam deploy --guided  # First time — stores config in samconfig.toml
+# Subsequent deploys:
+sam build && sam deploy
 ```
+
+SAM outputs the API Gateway URL. Copy it for the frontend step.
+
+### Frontend (S3)
+
+```bash
+cd frontend
+# Set the deployed API Gateway URL
+echo "VITE_API_BASE_URL=https://<api-id>.execute-api.ap-south-1.amazonaws.com/prod" > .env
+echo "VITE_EMERGENCY_NUMBER=112" >> .env
+echo "VITE_EMERGENCY_LABEL=India" >> .env
+
+npm ci && npm run build
+
+# Upload to the S3 bucket from SAM outputs
+aws s3 sync dist/ s3://<WebBucketName>/ --delete --region ap-south-1
+```
+
+### CloudFront (when account is verified)
+
+```bash
+aws cloudfront create-invalidation \
+  --distribution-id <DistributionId> \
+  --paths "/*"
+
+# Lock CORS to the CloudFront origin
+sam deploy --parameter-overrides AllowedOrigin=https://<your-cloudfront-domain>.cloudfront.net
+```
+
+---
+
+## Configuration
+
+| Variable | Description | Default |
+|---|---|---|
+| `VITE_API_BASE_URL` | API Gateway stage URL. Empty = full offline mode. | *(empty)* |
+| `VITE_EMERGENCY_NUMBER` | Number dialled by "Call now" buttons | `112` |
+| `VITE_EMERGENCY_LABEL` | Label shown next to emergency number | `India` |
+| `GuidanceModelId` | SAM parameter — Bedrock model ID | `amazon.nova-lite-v1:0` |
+| `AllowedOrigin` | SAM parameter — CORS allowed origin | `*` |
+
+> **Bedrock in ap-south-1:** Amazon Nova Lite is not available in-region for ap-south-1. Use the cross-region inference profile: set `GuidanceModelId` to `ap.amazon.nova-lite-v1:0` at deploy time:
+> ```bash
+> sam deploy --parameter-overrides GuidanceModelId=ap.amazon.nova-lite-v1:0
+> ```
+
+---
+
+## CI/CD
+
+GitLab CI pipeline (`.gitlab-ci.yml`) runs two stages on every push:
+
+| Stage | Job | What it does |
+|---|---|---|
+| `validate` | `validate-backend` | `sam validate --lint` — catches template errors before deploy |
+| `build` | `build-frontend` | `npm install && npm run build` — produces `frontend/dist/` artifact |
 
 ---
 
@@ -198,14 +434,28 @@ FirstAidFlow provides first-aid guidance only. It does not:
 - Replace emergency medical professionals
 - Guarantee outcomes
 
-In all life-threatening situations, the application prioritises calling emergency services (112 / 911 / local number). Verified guides are the sole source of first-aid instructions. AWS Bedrock is used only for description classification and is explicitly prevented from generating medical treatment content.
-
-For escalation-only categories (e.g. crush injury, neck/spinal injury, carbon monoxide exposure), the app advises calling emergency services immediately and does not bundle a step-by-step guide — because in those situations getting professional help started is the correct and safe response.
+In all life-threatening situations, the app prioritises calling emergency services (**112** in India). Verified guides are the sole source of first-aid instructions. For the 13 escalation-only categories, the app advises calling emergency services immediately and does not present a step-by-step guide.
 
 ---
 
 ## Guide Sources
 
-All 27 guidance guides are sourced from or cross-referenced with authoritative first-aid organisations. See `/sources` in the app or `frontend/src/guides/sources.js`.
+All 27 guidance guides are paraphrased from authoritative first-aid organisations. Content is never invented.
 
-Key sources include: British Red Cross, St John Ambulance, NHS, Asthma UK, Stroke Association UK, Epilepsy Action, American Heart Association.
+| Organisation | Coverage |
+|---|---|
+| British Red Cross | Bleeding, choking, burns, CPR, fractures |
+| St John Ambulance | Bleeding, choking, burns, bones, unconsciousness |
+| NHS (UK) | Stroke, seizures, allergic reaction, head injury |
+| Asthma + Lung UK | Asthma emergencies |
+| Stroke Association (UK) | Stroke — FAST recognition |
+| Epilepsy Action (UK) | Seizure management |
+| American Heart Association | CPR and cardiac emergencies |
+
+Full per-guide source attributions are visible in the app under `/sources`.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
