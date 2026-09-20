@@ -8,7 +8,7 @@
 [![PWA](https://img.shields.io/badge/PWA-Offline--First-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-FirstAidFlow is a Progressive Web App that delivers verified step-by-step first-aid guidance and real-time incident coordination support for emergency responders and bystanders. It operates fully offline once installed — guidance, classification, and incident logging all function without a network connection.
+FirstAidFlow is a Progressive Web App that delivers verified step-by-step first-aid guidance and real-time incident coordination support for emergency responders and bystanders. It supports offline emergency guidance, local classification, and incident logging without a network connection. When connectivity is available, AWS services provide cloud-based classification and incident synchronization.
 
 > Built for the **First Commit Hackathon 2026**
 
@@ -407,10 +407,13 @@ sam deploy --parameter-overrides AllowedOrigin=https://<your-cloudfront-domain>.
 | `GuidanceModelId` | SAM parameter — Bedrock model ID | `amazon.nova-lite-v1:0` |
 | `AllowedOrigin` | SAM parameter — CORS allowed origin | `*` |
 
-> **Bedrock in ap-south-1:** Amazon Nova Lite is not available in-region for ap-south-1. Use the cross-region inference profile: set `GuidanceModelId` to `ap.amazon.nova-lite-v1:0` at deploy time:
+> **Bedrock in ap-south-1:** Amazon Nova Lite requires an inference profile for invocation in this region. The exact inference profile available to an AWS account may depend on regional and account configuration. Check the available profiles with:
+>
 > ```bash
-> sam deploy --parameter-overrides GuidanceModelId=ap.amazon.nova-lite-v1:0
+> aws bedrock list-inference-profiles --region ap-south-1
 > ```
+>
+> Configure `GuidanceModelId` with an inference profile that is available and permitted for the account.
 
 ---
 
